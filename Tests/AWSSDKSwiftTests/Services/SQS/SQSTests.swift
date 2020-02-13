@@ -29,7 +29,8 @@ class SQSTests: XCTestCase {
         secretAccessKey: "secret",
         region: .useast1,
         endpoint: ProcessInfo.processInfo.environment["SQS_ENDPOINT"] ?? "http://localhost:4576",
-        middlewares: (ProcessInfo.processInfo.environment["AWS_ENABLE_LOGGING"] == "true") ? [AWSLoggingMiddleware()] : []
+        middlewares: (ProcessInfo.processInfo.environment["AWS_ENABLE_LOGGING"] == "true") ? [AWSLoggingMiddleware()] : [],
+        httpClientProvider: .createNew
     )
 
     class TestData {
@@ -46,10 +47,10 @@ class SQSTests: XCTestCase {
             let response = try client.createQueue(request).wait()
             XCTAssertNotNil(response.queueUrl)
             guard let queueUrl = response.queueUrl else {throw SQSTestsError.noQueueUrl}
-            
+
             self.queueUrl = queueUrl
         }
-        
+
         deinit {
             attempt {
                 let request = SQS.DeleteQueueRequest(queueUrl: self.queueUrl)
@@ -59,7 +60,7 @@ class SQSTests: XCTestCase {
     }
 
     //MARK: TESTS
-    
+
     func testSendReceiveAndDelete() {
         attempt {
             let testData = try TestData(#function, client: client)
@@ -67,11 +68,11 @@ class SQSTests: XCTestCase {
             let messageBody = "Testing, testing,1,2,1,2"
             let sendMessageRequest = SQS.SendMessageRequest(messageBody: messageBody, queueUrl: testData.queueUrl)
             let messageId = try client.sendMessage(sendMessageRequest).wait().messageId
-            
+
             // receive message tests the flattened arrays in XML response
             let receiveMessageRequest = SQS.ReceiveMessageRequest(maxNumberOfMessages: 10, queueUrl: testData.queueUrl)
             let messages = try client.receiveMessage(receiveMessageRequest).wait().messages ?? []
-            
+
             guard let message = messages.first else {
                 XCTFail("Expected to get first message")
                 return
@@ -90,7 +91,7 @@ class SQSTests: XCTestCase {
             try client.deleteMessage(deleteRequest).wait()
         }
     }
-    
+
     func testGetQueueAttributes() {
         attempt {
             let testData = try TestData(#function, client: client)
@@ -100,7 +101,7 @@ class SQSTests: XCTestCase {
             XCTAssertNotNil(result.attributes?[.queuearn])
         }
     }
-    
+
     func testTestPercentEncodedCharacters() {
         attempt {
             let testData = try TestData(#function, client: client)
@@ -108,10 +109,10 @@ class SQSTests: XCTestCase {
             let messageBody = "!@#$%^&*()-=_+[]{};':\",.<>\\|`~éñà"
             let sendMessageRequest = SQS.SendMessageRequest(messageBody: messageBody, queueUrl: testData.queueUrl)
             let messageId = try client.sendMessage(sendMessageRequest).wait().messageId
-            
+
             let receiveMessageRequest = SQS.ReceiveMessageRequest(maxNumberOfMessages: 10, queueUrl: testData.queueUrl)
             let messages = try client.receiveMessage(receiveMessageRequest).wait().messages ?? []
-            
+
             guard let message = messages.first else {
                 XCTFail("Expected to get first message")
                 return
@@ -139,4 +140,3 @@ class SQSTests: XCTestCase {
         ]
     }
 }
-

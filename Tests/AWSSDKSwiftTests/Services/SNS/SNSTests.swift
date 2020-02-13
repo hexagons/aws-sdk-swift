@@ -29,7 +29,8 @@ class SNSTests: XCTestCase {
         secretAccessKey: "secret",
         region: .useast1,
         endpoint: ProcessInfo.processInfo.environment["SNS_ENDPOINT"] ?? "http://localhost:4575",
-        middlewares: (ProcessInfo.processInfo.environment["AWS_ENABLE_LOGGING"] == "true") ? [AWSLoggingMiddleware()] : []
+        middlewares: (ProcessInfo.processInfo.environment["AWS_ENABLE_LOGGING"] == "true") ? [AWSLoggingMiddleware()] : [],
+        httpClientProvider: .createNew
     )
 
     class TestData {
@@ -45,10 +46,10 @@ class SNSTests: XCTestCase {
             let request = SNS.CreateTopicInput(name: topicName)
             let response = try client.createTopic(request).wait()
             guard let topicArn = response.topicArn else {throw SNSTestsError.noTopicArn}
-            
+
             self.topicArn = topicArn
         }
-        
+
         deinit {
             attempt {
                 // disabled until we get valid topic arn's returned from Localstack
@@ -61,13 +62,13 @@ class SNSTests: XCTestCase {
     }
 
     //MARK: TESTS
-    
+
     func testCreateDelete() {
         attempt {
             _ = try TestData(#function, client: client)
         }
     }
-    
+
     func testListTopics() {
         attempt {
             let testData = try TestData(#function, client: client)
@@ -78,7 +79,7 @@ class SNSTests: XCTestCase {
             XCTAssertNotNil(topic)
         }
     }
-    
+
     // disabled until we get valid topic arn's returned from Localstack
     #if false
     func testSetTopicAttributes() {
@@ -87,15 +88,15 @@ class SNSTests: XCTestCase {
 
             let setTopicAttributesInput = SNS.SetTopicAttributesInput(attributeName:"DisplayName", attributeValue: "aws-test topic", topicArn: testData.topicArn)
             try client.setTopicAttributes(setTopicAttributesInput).wait()
-            
+
             let getTopicAttributesInput = SNS.GetTopicAttributesInput(topicArn: testData.topicArn)
             let getTopicAttributesResponse = try client.getTopicAttributes(getTopicAttributesInput).wait()
-            
+
             XCTAssertEqual(getTopicAttributesResponse.attributes?["DisplayName"], "aws-test topic")
         }
     }
     #endif
-    
+
     static var allTests : [(String, (SNSTests) -> () throws -> Void)] {
         return [
             ("testCreateDelete", testCreateDelete),
@@ -104,5 +105,3 @@ class SNSTests: XCTestCase {
         ]
     }
 }
-
-

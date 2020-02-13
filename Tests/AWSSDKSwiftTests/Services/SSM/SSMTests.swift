@@ -29,7 +29,8 @@ class SSMTests: XCTestCase {
         secretAccessKey: "secret",
         region: .useast1,
         endpoint: ProcessInfo.processInfo.environment["SSM_ENDPOINT"] ?? "http://localhost:4583",
-        middlewares: (ProcessInfo.processInfo.environment["AWS_ENABLE_LOGGING"] == "true") ? [AWSLoggingMiddleware()] : []
+        middlewares: (ProcessInfo.processInfo.environment["AWS_ENABLE_LOGGING"] == "true") ? [AWSLoggingMiddleware()] : [],
+        httpClientProvider: .createNew
     )
 
     class TestData {
@@ -46,7 +47,7 @@ class SSMTests: XCTestCase {
             let request = SSM.PutParameterRequest(name: parameterName, overwrite: true, type: .string, value: parameterValue)
             _ = try client.putParameter(request).wait()
         }
-        
+
         deinit {
             attempt {
                 let request = SSM.DeleteParameterRequest(name: parameterName)
@@ -56,7 +57,7 @@ class SSMTests: XCTestCase {
     }
 
     //MARK: TESTS
-    
+
     func testGetParameter() {
         attempt {
             let testData = try TestData(#function, client: client)
@@ -66,7 +67,7 @@ class SSMTests: XCTestCase {
             XCTAssertEqual(response.parameter?.value, testData.parameterValue)
         }
     }
-    
+
     func testGetParametersByPath() {
         attempt {
             let testData = try TestData(#function, client: client)
@@ -75,13 +76,10 @@ class SSMTests: XCTestCase {
             XCTAssertNotNil(response.parameters?.first {$0.name == testData.parameterName})
         }
     }
-    
+
     static var allTests : [(String, (SSMTests) -> () throws -> Void)] {
         return [
             ("testGetParametersByPath", testGetParametersByPath),
         ]
     }
 }
-
-
-

@@ -25,13 +25,14 @@ class DynamoDBTests: XCTestCase {
         secretAccessKey: "secret",
         region: .useast1,
         endpoint: ProcessInfo.processInfo.environment["DYNAMODB_ENDPOINT"] ?? "http://localhost:4569",
-        middlewares: (ProcessInfo.processInfo.environment["AWS_ENABLE_LOGGING"] == "true") ? [AWSLoggingMiddleware()] : []
+        middlewares: (ProcessInfo.processInfo.environment["AWS_ENABLE_LOGGING"] == "true") ? [AWSLoggingMiddleware()] : [],
+        httpClientProvider: .createNew
     )
 
     class TestData {
         var client: DynamoDB
         var tableName: String
-        
+
         init(_ testName: String, client: DynamoDB) throws {
             let testName = testName.lowercased().filter { return $0.isLetter }
             self.client = client
@@ -60,7 +61,7 @@ class DynamoDBTests: XCTestCase {
             )
             _ = try client.putItem(putItemInput).wait()
         }
-        
+
         deinit {
             attempt {
                 let input = DynamoDB.DeleteTableInput(tableName: self.tableName)
@@ -71,10 +72,10 @@ class DynamoDBTests: XCTestCase {
 
 
     //MARK: TESTS
-    
+
     func testGetObject() {
         attempt {
-            
+
             let testData = try TestData(#function, client: client)
 
             let input = DynamoDB.GetItemInput(
