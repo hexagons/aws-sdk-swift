@@ -75,7 +75,7 @@ class S3Tests: XCTestCase {
 
             let putRequest = S3.PutObjectRequest(
                 acl: .publicRead,
-                body: testData.bodyData,
+                body: .data(testData.bodyData),
                 bucket: testData.bucket,
                 contentLength: Int64(testData.bodyData.count),
                 key: testData.key
@@ -93,7 +93,7 @@ class S3Tests: XCTestCase {
 
             let putRequest = S3.PutObjectRequest(
                 acl: .publicRead,
-                body: testData.bodyData,
+                body: .data(testData.bodyData),
                 bucket: testData.bucket,
                 contentLength: Int64(testData.bodyData.count),
                 key: testData.key
@@ -111,7 +111,7 @@ class S3Tests: XCTestCase {
 
             let putRequest = S3.PutObjectRequest(
                 acl: .publicRead,
-                body: testData.bodyData,
+                body: .data(testData.bodyData),
                 bucket: testData.bucket,
                 contentLength: Int64(testData.bodyData.count),
                 key: testData.key
@@ -229,7 +229,7 @@ class S3Tests: XCTestCase {
 
             let putRequest = S3.PutObjectRequest(
                 acl: .publicRead,
-                body: testData.bodyData,
+                body: .data(testData.bodyData),
                 bucket: testData.bucket,
                 contentLength: Int64(testData.bodyData.count),
                 key: testData.key
@@ -284,7 +284,7 @@ class S3Tests: XCTestCase {
         attempt {
             let testData = try TestData(#function, client: client)
 
-            let putObjectRequest = S3.PutObjectRequest(body: testData.bodyData, bucket: testData.bucket, key: testData.key, metadata: ["Test": "testing", "first" : "one"])
+            let putObjectRequest = S3.PutObjectRequest(body: .data(testData.bodyData), bucket: testData.bucket, key: testData.key, metadata: ["Test": "testing", "first" : "one"])
             _ = try client.putObject(putObjectRequest).wait()
 
             let getObjectRequest = S3.GetObjectRequest(bucket: testData.bucket, key: testData.key)
@@ -303,9 +303,8 @@ class S3Tests: XCTestCase {
             for i in 0..<16 {
                 let objectName = "testMultiple\(i).txt"
                 let text = "Testing, testing,1,2,1,\(i)"
-                let data = text.data(using: .utf8)!
 
-                let request = S3.PutObjectRequest(body: data, bucket: testData.bucket, key: objectName)
+                let request = S3.PutObjectRequest(body: .string(text), bucket: testData.bucket, key: objectName)
                 let response = client.putObject(request)
                     .flatMap { (response)->EventLoopFuture<S3.GetObjectOutput> in
                         let request = S3.GetObjectRequest(bucket: testData.bucket, key: objectName)
@@ -335,7 +334,7 @@ class S3Tests: XCTestCase {
         attempt {
             let testData = try TestData(#function, client: client)
             let putRequest = S3.PutObjectRequest(
-                body: testData.bodyData,
+                body: .data(testData.bodyData),
                 bucket: testData.bucket,
                 contentLength: Int64(testData.bodyData.count),
                 key: testData.key
@@ -355,9 +354,8 @@ class S3Tests: XCTestCase {
             for i in 0..<16 {
                 let objectName = "testMultiple\(i).txt"
                 let text = "Testing, testing,1,2,1,\(i)"
-                let data = text.data(using: .utf8)!
 
-                let request = S3.PutObjectRequest(body: data, bucket: testData.bucket, key: objectName)
+                let request = S3.PutObjectRequest(body: .string(text), bucket: testData.bucket, key: objectName)
                 let response = client.putObject(request).map { _ in }
                 responses.append(response)
             }

@@ -440,14 +440,14 @@ extension CodeGuruProfiler {
             AWSMemberEncoding(label: "profilingGroupName", location: .uri(locationName: "profilingGroupName"))
         ]
 
-        public let agentProfile: Data
+        public let agentProfile: AWSPayload
         /// The content type of the agent profile in the payload. Recommended to send the profile gzipped with content-type application/octet-stream. Other accepted values are application/x-amzn-ion and application/json for unzipped Ion and JSON respectively.
         public let contentType: String
         /// Client generated token to deduplicate the agent profile during aggregation.
         public let profileToken: String?
         public let profilingGroupName: String
 
-        public init(agentProfile: Data, contentType: String, profileToken: String? = PostAgentProfileRequest.idempotencyToken(), profilingGroupName: String) {
+        public init(agentProfile: AWSPayload, contentType: String, profileToken: String? = PostAgentProfileRequest.idempotencyToken(), profilingGroupName: String) {
             self.agentProfile = agentProfile
             self.contentType = contentType
             self.profileToken = profileToken
