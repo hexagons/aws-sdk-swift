@@ -71,7 +71,7 @@ public extension S3 {
                 }
 
                 let newOffset = offset + Int64(partSize)
-                multipartDownloadPart(fileSize: fileSize, offset: newOffset, prevPartSave: outputStream(body, fileSize))
+                multipartDownloadPart(fileSize: fileSize, offset: newOffset, prevPartSave: outputStream(body.asData() ?? Data(), fileSize))
             }
             future.whenFailure { error in
                 promise.fail(error)

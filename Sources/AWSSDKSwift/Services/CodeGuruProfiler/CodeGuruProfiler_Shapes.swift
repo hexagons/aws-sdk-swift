@@ -291,9 +291,9 @@ extension CodeGuruProfiler {
         public let contentEncoding: String?
         /// The content type of the profile in the payload. Will be application/json or application/x-amzn-ion based on Accept header in the request.
         public let contentType: String
-        public let profile: Data
+        public let profile: AWSPayload
 
-        public init(contentEncoding: String? = nil, contentType: String, profile: Data) {
+        public init(contentEncoding: String? = nil, contentType: String, profile: AWSPayload) {
             self.contentEncoding = contentEncoding
             self.contentType = contentType
             self.profile = profile

@@ -39,9 +39,9 @@ extension IoTDataPlane {
         ]
 
         /// The state information, in JSON format.
-        public let payload: Data
+        public let payload: AWSPayload
 
-        public init(payload: Data) {
+        public init(payload: AWSPayload) {
             self.payload = payload
         }
 
@@ -81,9 +81,9 @@ extension IoTDataPlane {
         ]
 
         /// The state information, in JSON format.
-        public let payload: Data?
+        public let payload: AWSPayload?
 
-        public init(payload: Data? = nil) {
+        public init(payload: AWSPayload? = nil) {
             self.payload = payload
         }
 
@@ -164,9 +164,9 @@ extension IoTDataPlane {
         ]
 
         /// The state information, in JSON format.
-        public let payload: Data?
+        public let payload: AWSPayload?
 
-        public init(payload: Data? = nil) {
+        public init(payload: AWSPayload? = nil) {
             self.payload = payload
         }
 

@@ -459,7 +459,8 @@ struct AWSService {
     func postProcessShapes(_ shapes: inout [Shape]) {
         for i in 0..<shapes.count {
             let shape = shapes[i]
-            guard shape.usedInInput else { continue }
+            //guard shape.usedInInput else { continue }
+            // For shapes with a raw payload set the raw payload member to be a .payload instead of .blob
             guard case .structure(let shapeStructure) = shape.type else { continue }
             guard let payload = shapeStructure.payload else { continue }
             guard let memberIndex = shapeStructure.members.firstIndex(where: { $0.name == payload }) else { continue }

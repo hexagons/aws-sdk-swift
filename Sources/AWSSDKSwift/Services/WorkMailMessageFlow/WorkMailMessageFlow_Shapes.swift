@@ -39,9 +39,9 @@ extension WorkMailMessageFlow {
         ]
 
         /// The raw content of the email message, in MIME format.
-        public let messageContent: Data
+        public let messageContent: AWSPayload
 
-        public init(messageContent: Data) {
+        public init(messageContent: AWSPayload) {
             self.messageContent = messageContent
         }
 
